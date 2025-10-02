@@ -1,23 +1,16 @@
-export interface Node {
-  id: string;
-  data?: any;
+export interface GraphNode {
+  id: string;              
+  name: string;
+  sensitive?: boolean;
+  meta?: Record<string, any>;
 }
 
-export interface Edge {
-  from: string;
-  to: string;
-  weight?: number;
+export interface GraphEdge {
+  from: string;  
+  to: string;    
 }
-
 export interface Graph {
-  nodes: Node[];
-  edges: Edge[];
-}
-
-export interface GraphAnalysisResult {
-  nodeCount: number;
-  edgeCount: number;
-  shortestPath?: string[];
-  connectedComponents?: string[][];
-  diameter?: number;
+  graphId: string;       
+  nodes: GraphNode[];     
+  edges: GraphEdge[];     
 }

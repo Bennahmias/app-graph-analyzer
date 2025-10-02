@@ -1,6 +1,12 @@
-import { Node, Edge } from '../../common/types';
+import { IsArray, IsString } from 'class-validator';
 
 export class CreateGraphDto {
-  nodes: Node[];
-  edges: Edge[];
+  @IsString()
+  graphId: string;
+
+  @IsArray()
+  nodes: { id: string; name: string; sensitive?: boolean }[];
+
+  @IsArray()
+  edges: { from: string; to: string }[];
 }
