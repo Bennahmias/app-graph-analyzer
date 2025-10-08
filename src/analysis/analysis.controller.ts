@@ -12,7 +12,12 @@ export class AnalysisController {
     @Param('id') id: string,
     @Body() dto: AnalyzeGraphDto,
   ) {
-    return this.analysisService.analyze(id, dto.maxPathLength);
+    return this.analysisService.analyze(
+      id, 
+      dto.maxPathLength,
+      dto.includeAllPaths,
+      dto.calculateRiskLevels
+    );
   }
 }
 

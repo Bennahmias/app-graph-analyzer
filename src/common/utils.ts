@@ -1,43 +1,57 @@
 import { Graph } from './types';
 
-export interface BFSResult {
-  reachable: boolean;   
-  path?: string[];      
+export interface PathResult {
+  reachable: boolean;
+  paths?: string[][]; // Multiple paths instead of single path
+  shortestPath?: string[];
+  allSensitiveNodesReached?: string[];
 }
 
-/**
- * @param graph 
- * @param startId 
- * @param sensitiveNodes 
- * @param maxLen 
- */
-export function bfs(
-  graph: Graph,
-  startId: string,
-  sensitiveNodes: string[],
-  maxLen = 6
-): BFSResult {
-  const queue: string[][] = [[startId]];
-  const visited = new Set([startId]);
+export function findAllPathsToSensitive(
+  graph: Graph, 
+  startNode: string, 
+  sensitiveNodes: string[], 
+  maxLength: number = 6
+): PathResult {
+  const allPaths: string[][] = [];
+  const sensitiveNodesReached = new Set<string>();
 
-  while (queue.length > 0) {
-    const path = queue.shift()!;
-    const node = path[path.length - 1];
+  function dfs(current: string, path: string[], visited: Set<string>, depth: number) {
+    if (depth > maxLength) return;
 
-    
-    if (sensitiveNodes.includes(node)) {
-      return { reachable: true, path };
+    // If we reached a sensitive node, save this path
+    if (sensitiveNodes.includes(current)) {
+      allPaths.push([...path, current]);
+      sensitiveNodesReached.add(current);
+      return; // Don't continue from sensitive nodes
     }
 
-    if (path.length > maxLen) continue;
+    // Get neighbors
+    const neighbors = graph.edges
+      .filter(edge => edge.from === current)
+      .map(edge => edge.to)
+      .filter(neighbor => !visited.has(neighbor));
 
-    for (const edge of graph.edges) {
-      if (edge.from === node && !visited.has(edge.to)) {
-        visited.add(edge.to);
-        queue.push([...path, edge.to]);
-      }
+    // Explore each neighbor
+    for (const neighbor of neighbors) {
+      const newVisited = new Set(visited);
+      newVisited.add(current);
+      dfs(neighbor, [...path, current], newVisited, depth + 1);
     }
   }
 
-  return { reachable: false };
+  dfs(startNode, [], new Set(), 0);
+
+  const shortestPath = allPaths.length > 0 
+    ? allPaths.reduce((shortest, current) => 
+        current.length < shortest.length ? current : shortest
+      ) 
+    : undefined;
+
+  return {
+    reachable: allPaths.length > 0,
+    paths: allPaths,
+    shortestPath,
+    allSensitiveNodesReached: Array.from(sensitiveNodesReached)
+  };
 }
