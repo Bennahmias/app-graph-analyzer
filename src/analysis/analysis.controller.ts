@@ -1,5 +1,6 @@
 import { Body, Controller, Param, Post } from '@nestjs/common';
 import { AnalysisService } from './analysis.service';
+import { AnalyzeGraphDto } from './dto/analyze-graph.dto';
 
 @Controller('graphs/:id/analyze')
 export class AnalysisController {
@@ -9,9 +10,9 @@ export class AnalysisController {
   @Post()
   analyze(
     @Param('id') id: string,
-    @Body('maxPathLength') maxPathLength?: number,
+    @Body() dto: AnalyzeGraphDto,
   ) {
-    return this.analysisService.analyze(id, maxPathLength);
+    return this.analysisService.analyze(id, dto.maxPathLength);
   }
 }
 
